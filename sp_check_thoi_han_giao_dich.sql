@@ -41,10 +41,11 @@ proc_main: BEGIN
        Khai báo hằng số kết quả
     ================================ */
     DECLARE c_PASS VARCHAR(10) DEFAULT 'PASS';
-    DECLARE c_FAIL_EXPIRED VARCHAR(20) DEFAULT 'FAIL';
+    DECLARE c_FAIL_EXPIRED VARCHAR(20) DEFAULT 'FAIL_EXPRIED';
     DECLARE c_FAIL_NO_CUSTOMER VARCHAR(30) DEFAULT 'FAIL_NO_CUSTOMER';
     DECLARE c_FAIL_NO_HMGD VARCHAR(30) DEFAULT 'FAIL_NO_HMGD';
     DECLARE c_FAIL_INVALID_INPUT VARCHAR(30) DEFAULT 'FAIL_INVALID_INPUT';
+    DECLARE c_FAIL_INVALID_DATE VARCHAR(30) DEFAULT 'FAIL_INVALID_DATE';
 
     /* ===============================
        1. Check input
@@ -53,9 +54,14 @@ proc_main: BEGIN
         SET p_result = c_FAIL_INVALID_INPUT;
         LEAVE proc_main;
     END IF;
-
+    
+    IF p_ngay_dat_lenh < CURRENT_DATE THEN
+        SET p_result = c_FAIL_INVALID_DATE;
+        LEAVE proc_main;
+    END IF;
+    
     /* ===============================
-       2. Check khách hàng tồn tại
+       2. Lấy thông tin HMGD gắn với CIF
     ================================ */
     SELECT hmgd_id
     INTO v_hmgd_id
@@ -68,7 +74,7 @@ proc_main: BEGIN
     END IF;
 
     /* ===============================
-       3. Check HMGD tồn tại
+       3. Check HMGD có thời gian không
     ================================ */
     SELECT thoi_han
     INTO v_thoi_han
